@@ -1,5 +1,5 @@
 import {
-
+  SignedIn,
   SignedOut,
   SignInButton,
   SignUpButton,
@@ -28,18 +28,24 @@ async function Header() {
             <li>
               <Link href="/about">About</Link>
             </li>
-            
-              <SignedOut>
-                <SignInButton />
+
+            <SignedOut>
+              <SignInButton>
+                <button className="bg-[#6c47ff] text-white rounded-full font-medium px-4 py-1 sm:px-5 cursor-pointer">
+                  Sign In
+                </button>
+              </SignInButton>
               <SignUpButton>
                 <button className="bg-[#6c47ff] text-white rounded-full font-medium px-4 py-1 sm:px-5 cursor-pointer">
                   Sign Up
                 </button>
               </SignUpButton>
-              </SignedOut>
+            </SignedOut>
 
             <li>
-               <UserButton/>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
             </li>
           </ul>
         </nav>
