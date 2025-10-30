@@ -1,24 +1,64 @@
-import { verifyWebhook } from '@clerk/nextjs/webhooks'
-import { NextRequest } from 'next/server'
+import { createOrUpdateUser, deleteUser } from "@/lib/actions/user";
+import { verifyWebhook } from "@clerk/nextjs/webhooks";
+import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const evt = await verifyWebhook(req)
+    // التحقق من صحة التوقيع باستخدام المفتاح السري
+    const evt = await verifyWebhook(req);
 
-    // Do something with payload
-    // For this guide, log payload to console
-    const { id } = evt.data
-    const eventType = evt.type
-    console.log(`Received webhook with ID ${id} and event type of ${eventType}`)
-    console.log('Webhook payload:', evt.data)
+    const { id } = evt.data;
+    const eventType = evt.type;
 
-    if (evt.type === 'user.created') {
-    console.log('userId:', evt.data.id)
-}
+    console.log(`✅ Webhook received: ${eventType} - ID: ${id}`);
+    console.log("📦 Payload:", evt.data);
 
-    return new Response('Webhook received', { status: 200 })
+    // 🟢 عند إنشاء أو تعديل المستخدم
+    if (eventType === "user.created" || eventType === "user.updated") {
+      const {
+        id,
+        email_addresses,
+        first_name,
+        last_name,
+        image_url,
+        username,
+      } = evt.data;
+
+      try {
+        await createOrUpdateUser({
+          id,
+          email_addresses: email_addresses?.[0]?.email_address,
+          first_name,
+          last_name,
+          image_url,
+          username,
+        });
+
+        console.log("✅ User created/updated successfully in DB");
+      } catch (error) {
+        console.error("❌ Error creating or updating user:", error);
+      }
+    }
+
+    // 🔴 عند حذف المستخدم
+    if (eventType === "user.deleted") {
+      const { id } = evt?.data;
+
+      try {
+        await deleteUser(id);
+        console.log("🗑️ User deleted successfully:", id);
+        return new Response("User is deleted", { status: 200 });
+      } catch (error) {
+        console.error(" Error deleting user:", error);
+        return new Response("Error occurred while deleting user", {
+          status: 400,
+        });
+      }
+    }
+
+    return new Response("Webhook processed successfully", { status: 200 });
   } catch (err) {
-    console.error('Error verifying webhook:', err)
-    return new Response('Error verifying webhook', { status: 400 })
+    console.error("❌ Error verifying webhook:", err);
+    return new Response("Error verifying webhook", { status: 400 });
   }
 }
