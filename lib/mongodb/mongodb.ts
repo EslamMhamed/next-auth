@@ -6,6 +6,10 @@ let isConnected = false
 export async function connectDB(){
     mongoose.set('strictQuery', true)
 
+     if(!process.env.MONGODB_URL){
+     return console.log('Missing MongoDB url')
+    }
+
     if(isConnected){
         console.log('MongoDB already connected')
         return;
