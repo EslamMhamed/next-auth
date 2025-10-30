@@ -3,7 +3,7 @@ import { connectDB } from "../mongodb/mongodb";
 
 type User = {
   id: string;
-  email_addresses: string;
+  email_addresses: string[];
   first_name: string | null;
   last_name: string | null;
   image_url: string;
@@ -28,7 +28,7 @@ export async function createOrUpdateUser({
           firstName: first_name,
           lastName: last_name,
           avatar: image_url,
-          email:  email_addresses[0].email_address,
+          email:  email_addresses?.[0]?.email_address,
           username: username,
         },
       },
@@ -40,7 +40,7 @@ export async function createOrUpdateUser({
   }
 }
 
-export async function deleteUser(id:{id: string}){
+export async function deleteUser(id:string){
     try {
         await connectDB()
         User.deleteOne({clerkId: id})

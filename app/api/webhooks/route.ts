@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       try {
         await createOrUpdateUser({
           id,
-          email_addresses: email_addresses?.[0]?.email_address,
+          email_addresses,
           first_name,
           last_name,
           image_url,
