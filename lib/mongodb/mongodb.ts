@@ -13,7 +13,7 @@ export async function connectDB(){
 
     try {
         await mongoose.connect(process.env.MONGODB_URL, {
-            dbName: 'next auth app'
+            dbName: 'next-auth-app'
         })
         console.log('MongoDB connected')
         isConnected = true
