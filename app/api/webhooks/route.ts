@@ -4,16 +4,14 @@ import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    // التحقق من صحة التوقيع باستخدام المفتاح السري
     const evt = await verifyWebhook(req);
 
     const { id } = evt.data;
     const eventType = evt.type;
 
-    console.log(`✅ Webhook received: ${eventType} - ID: ${id}`);
-    console.log("📦 Payload:", evt.data);
+    console.log(` Webhook received: ${eventType} - ID: ${id}`);
+    console.log(" Payload:", evt.data);
 
-    // 🟢 عند إنشاء أو تعديل المستخدم
     if (eventType === "user.created" || eventType === "user.updated") {
       const {
         id,
@@ -36,16 +34,16 @@ export async function POST(req: NextRequest) {
 
         console.log("✅ User created/updated successfully in DB");
       } catch (error) {
-        console.error("❌ Error creating or updating user:", error);
+        console.error(" Error creating or updating user:", error);
       }
     }
 
-    // 🔴 عند حذف المستخدم
+   
     if (eventType === "user.deleted") {
       const { id } = evt?.data;
 
       try {
-        await deleteUser(id);
+        await deleteUser(id); 
         console.log("🗑️ User deleted successfully:", id);
         return new Response("User is deleted", { status: 200 });
       } catch (error) {
@@ -58,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     return new Response("Webhook processed successfully", { status: 200 });
   } catch (err) {
-    console.error("❌ Error verifying webhook:", err);
+    console.error(" Error verifying webhook:", err);
     return new Response("Error verifying webhook", { status: 400 });
   }
 }

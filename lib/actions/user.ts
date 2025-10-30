@@ -1,9 +1,13 @@
 import User from "../models/user.model";
 import { connectDB } from "../mongodb/mongodb";
 
-type User = {
+type EmailAddress = {
+  email_address: string;
+};
+
+type UserType = {
   id: string;
-  email_addresses: string[];
+  email_addresses: EmailAddress[];
   first_name: string | null;
   last_name: string | null;
   image_url: string;
@@ -17,7 +21,7 @@ export async function createOrUpdateUser({
   last_name,
   image_url,
   username,
-}: User) {
+}: UserType) {
   try {
     await connectDB();
 
@@ -28,23 +32,24 @@ export async function createOrUpdateUser({
           firstName: first_name,
           lastName: last_name,
           avatar: image_url,
-          email:  email_addresses?.[0]?.email_address,
+          email: email_addresses?.[0]?.email_address,
           username: username,
         },
       },
       { new: true, upsert: true }
     );
-    return user ;
+    return user;
   } catch (error) {
-    console.log('Error creating or updating user', error)
+    console.log("Error creating or updating user", error);
   }
 }
 
-export async function deleteUser(id:string){
-    try {
-        await connectDB()
-        User.deleteOne({clerkId: id})
-    } catch (error) {
-        console.log('error deleting user', error)
-    }
+export async function deleteUser(id: string | undefined) {
+  try {
+    await connectDB();
+    const result = await User.deleteOne({ clerkId: id });
+    console.log("Deleted user:", result);
+  } catch (error) {
+    console.log("Error deleting user:", error);
+  }
 }
